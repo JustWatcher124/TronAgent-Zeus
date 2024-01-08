@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
 
 class QTrainer:
     def __init__(self, model, lr, gamma):
