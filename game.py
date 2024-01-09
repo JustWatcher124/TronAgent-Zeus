@@ -1,5 +1,6 @@
 import pygame
 from tronagent import TronAgent
+import math
 from agentconfigs import AGENT_ONE, AGENT_TWO
 from settings import WHITE, BLACK, SCREEN_WIDTH, SCREEN_HEIGHT, SPEED
 
@@ -17,8 +18,8 @@ class SnakeGameAI:
         pygame.display.set_caption('Snake')
         self.clock = pygame.time.Clock()
         self.agents = [TronAgent(AGENT_ONE), TronAgent(AGENT_TWO)]
+        self.n_games = 0
         self.reset()
-
         
     def reset(self):
         
@@ -31,6 +32,10 @@ class SnakeGameAI:
 
         self.score = 0
         self.frame_iteration = 0
+        if self.n_games == 0:
+            self.n_games = 0.1
+        else:
+            self.n_games += 1
         
     def play_step(self):
 
@@ -53,6 +58,6 @@ class SnakeGameAI:
             for pt in agent.snake:
                 pygame.draw.rect(self.display, agent.color, pygame.Rect(pt.x, pt.y, agent.size, agent.size))
         
-        text = font.render("Score: " + str(self.score), True, WHITE)
+        text = font.render("Games: " + str(math.floor(self.n_games)), True, WHITE)
         self.display.blit(text, [0, 0])
         pygame.display.flip()

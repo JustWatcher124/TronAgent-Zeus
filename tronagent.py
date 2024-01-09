@@ -16,36 +16,40 @@ class TronAgent:
 
         self.start_x = tron_agent_config.start_x
         self.start_y = tron_agent_config.start_y
+        self.name = tron_agent_config.name
 
         # TODO: model, trainer
         self.model = tron_agent_config.model
         self.trainer = tron_agent_config.trainer
 
     def reset(self):
+        self.cut_off_reward = 0
         self.direction = Direction.UP    
         self.head = Point(self.start_x, self.start_y)
         self.snake = [
             self.head, 
-            Point(self.head.x - BLOCK_SIZE, self.head.y),
-            Point(self.head.x - (2 * BLOCK_SIZE), self.head.y)
         ]
 
     def set_opponent(self, opponent):
         self.opponent = opponent
-        if self.head == self.opponent.head:
-            print("!COLLISION!")
 
     def is_collision(self, pt=None):
         if pt is None:
             pt = self.head
+            # hits opponent
+            if pt in self.opponent.snake[1:]:
+                self.opponent.cut_off_reward = 10
+                print("!COLLISION! @ opponent", self.opponent.head, self.name, self.head)
+                return True
+        else:
+            if pt in self.opponent.snake[1:]:
+                return True
+
         # hits boundary
         if pt.x > SCREEN_WIDTH - BLOCK_SIZE or pt.x < 0 or pt.y > SCREEN_HEIGHT - BLOCK_SIZE or pt.y < 0:
             return True
         # hits itself
         if pt in self.snake[1:]:
-            return True
-        # hits opponent
-        if pt in self.opponent.snake[1:]:
             return True
         
         return False
@@ -88,20 +92,21 @@ class TronAgent:
         old_state = self.get_state()
         final_move = self.get_action(epsilon, old_state)
         self.move(final_move)
-        reward = 0
+        reward = 0 + self.cut_off_reward
         isCollision = False
 
         if self.is_collision():
             reward = -10
             isCollision = True
 
-        if self.opponent.is_collision():
-            reward = 10
-            self.score += 1
-
         new_state = self.get_state()
+
         self.train_short_memory(old_state, final_move, reward, new_state, isCollision)
         self.remember(old_state, final_move, reward, new_state, isCollision)
+        
+        if isCollision:
+            print("Name:", self.name, "Reward", reward, self.opponent.name, self.opponent.cut_off_reward )
+
         return isCollision, self.score
     
     def train_short_memory(self, state, action, reward, next_state, isCollision):

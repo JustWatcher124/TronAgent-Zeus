@@ -4,7 +4,7 @@ from settings import BLOCK_SIZE, BLUE, ORANGE, SCREEN_HEIGHT, SCREEN_WIDTH
 from model import Linear_QNet
 from trainer import QTrainer
 
-Agent = namedtuple('Agent','color, block_size, model, trainer, start_y, start_x')
+Agent = namedtuple('Agent','color, block_size, model, trainer, start_y, start_x, name')
 
 # Use a decimal
 def get_starting_pos_y(num):
@@ -25,7 +25,7 @@ AGENT_ONE_OUTPUT_SIZE = 3
 AGENT_ONE_INPUT_SIZE = 7
 AGENT_ONE_SAVE_FOLDER = './agent_one'
 AGENT_ONE_STARTING_Y = get_starting_pos_y(.80)
-AGENT_ONE_STARTING_X = get_starting_pos_x(0.75)
+AGENT_ONE_STARTING_X = get_starting_pos_x(0.20)
 
 AGENT_ONE_MODEL = Linear_QNet(
     AGENT_ONE_INPUT_SIZE,
@@ -46,7 +46,8 @@ AGENT_ONE = Agent(
     AGENT_ONE_MODEL,
     AGENT_ONE_TRAINER,
     AGENT_ONE_STARTING_Y,
-    AGENT_ONE_STARTING_X
+    AGENT_ONE_STARTING_X,
+    "AGENT_ONE"
 )
 
 # AGENT2
@@ -56,8 +57,8 @@ AGENT_TWO_HIDDEN_SIZE = 256 # hidden layer
 AGENT_TWO_OUTPUT_SIZE = 3
 AGENT_TWO_INPUT_SIZE = 7
 AGENT_TWO_SAVE_FOLDER = './agent_two'
-AGENT_TWO_STARTING_Y = get_starting_pos_y(.80)
-AGENT_TWO_STARTING_X = get_starting_pos_x(0.25)
+AGENT_TWO_STARTING_Y = get_starting_pos_y(0.2)
+AGENT_TWO_STARTING_X = get_starting_pos_x(0.8)
 
 AGENT_TWO_MODEL = Linear_QNet(
     AGENT_TWO_INPUT_SIZE,
@@ -78,5 +79,6 @@ AGENT_TWO = Agent(
     AGENT_TWO_MODEL,
     AGENT_TWO_TRAINER,
     AGENT_TWO_STARTING_Y,
-    AGENT_TWO_STARTING_X
+    AGENT_TWO_STARTING_X,
+    "AGENT_TWO"
 )
