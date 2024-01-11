@@ -1,10 +1,10 @@
 from collections import namedtuple
 import math
-from settings import BLOCK_SIZE, BLUE, ORANGE, SCREEN_HEIGHT, SCREEN_WIDTH
+from settings import BLOCK_SIZE, BLUE, ORANGE, RED, BLUE_TWO, SCREEN_HEIGHT, SCREEN_WIDTH
 from model import Linear_QNet
 from trainer import QTrainer
 
-Agent = namedtuple('Agent','color, block_size, model, trainer, start_y, start_x, name')
+Agent = namedtuple('Agent','color, head_color, block_size, model, trainer, start_y, start_x, name')
 
 # Use a decimal
 def get_starting_pos_y(num):
@@ -12,11 +12,13 @@ def get_starting_pos_y(num):
         print("Starting position y needs to be a decimal greater than 0 and less than 1")
         return 0
     return math.floor((SCREEN_HEIGHT / BLOCK_SIZE) * num) * BLOCK_SIZE
+
 def get_starting_pos_x(num):
     if num > 1 or num < 0:
         print("Starting position x needs to be a decimal greater than 0 and less than 1")
         return 0
     return math.floor((SCREEN_WIDTH / BLOCK_SIZE) * num) * BLOCK_SIZE
+
 # AGENT1
 AGENT_ONE_LR = 0.001
 AGENT_ONE_GAMMA = 0.9 # not greater than 1
@@ -24,8 +26,8 @@ AGENT_ONE_HIDDEN_SIZE = 256 # hidden layer
 AGENT_ONE_OUTPUT_SIZE = 3
 AGENT_ONE_INPUT_SIZE = 7
 AGENT_ONE_SAVE_FOLDER = './agent_one'
-AGENT_ONE_STARTING_Y = get_starting_pos_y(.80)
-AGENT_ONE_STARTING_X = get_starting_pos_x(0.20)
+AGENT_ONE_STARTING_Y = get_starting_pos_y(0.9)
+AGENT_ONE_STARTING_X = get_starting_pos_x(0.40)
 
 AGENT_ONE_MODEL = Linear_QNet(
     AGENT_ONE_INPUT_SIZE,
@@ -42,6 +44,7 @@ AGENT_ONE_TRAINER = QTrainer(
 
 AGENT_ONE = Agent(
     ORANGE,
+    RED,
     BLOCK_SIZE,
     AGENT_ONE_MODEL,
     AGENT_ONE_TRAINER,
@@ -57,8 +60,8 @@ AGENT_TWO_HIDDEN_SIZE = 256 # hidden layer
 AGENT_TWO_OUTPUT_SIZE = 3
 AGENT_TWO_INPUT_SIZE = 7
 AGENT_TWO_SAVE_FOLDER = './agent_two'
-AGENT_TWO_STARTING_Y = get_starting_pos_y(0.2)
-AGENT_TWO_STARTING_X = get_starting_pos_x(0.8)
+AGENT_TWO_STARTING_Y = get_starting_pos_y(0.9)
+AGENT_TWO_STARTING_X = get_starting_pos_x(0.6)
 
 AGENT_TWO_MODEL = Linear_QNet(
     AGENT_TWO_INPUT_SIZE,
@@ -75,6 +78,7 @@ AGENT_TWO_TRAINER = QTrainer(
 
 AGENT_TWO = Agent(
     BLUE,
+    BLUE_TWO,
     BLOCK_SIZE,
     AGENT_TWO_MODEL,
     AGENT_TWO_TRAINER,

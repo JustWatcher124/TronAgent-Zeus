@@ -1,3 +1,4 @@
+from tronmodel import TronModel
 from direction import Direction 
 from point import Point
 from collections import deque
@@ -9,9 +10,9 @@ import torch
 class TronAgent:
     def __init__(self, tron_agent_config):
         self.color = tron_agent_config.color
+        self.head_color = tron_agent_config.head_color
         self.size = tron_agent_config.block_size
         self.direction = Direction.UP
-        self.score = 0
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
 
         self.start_x = tron_agent_config.start_x
@@ -21,6 +22,8 @@ class TronAgent:
         # TODO: model, trainer
         self.model = tron_agent_config.model
         self.trainer = tron_agent_config.trainer
+
+        self.tron_model = TronModel(tron_agent_config)
 
     def reset(self):
         self.cut_off_reward = 0
@@ -37,12 +40,13 @@ class TronAgent:
         if pt is None:
             pt = self.head
             # hits opponent
-            if pt in self.opponent.snake[1:]:
+            print("Is collision? at", self.head)
+            if pt in self.opponent.snake:
                 self.opponent.cut_off_reward = 10
-                print("!COLLISION! @ opponent", self.opponent.head, self.name, self.head)
+                print(self.name,"collided with", self.opponent.name, "at", self.head)
                 return True
         else:
-            if pt in self.opponent.snake[1:]:
+            if pt in self.opponent.snake:
                 return True
 
         # hits boundary
@@ -88,9 +92,10 @@ class TronAgent:
     def update(self, eps):
         epsilon = eps
         if epsilon < 0:
-            epsilon = 0
+            epsilon = 0.01
+
         old_state = self.get_state()
-        final_move = self.get_action(epsilon, old_state)
+        final_move = self.tron_model.get_next_move(epsilon, old_state)
         self.move(final_move)
         reward = 0 + self.cut_off_reward
         isCollision = False
@@ -101,13 +106,10 @@ class TronAgent:
 
         new_state = self.get_state()
 
-        self.train_short_memory(old_state, final_move, reward, new_state, isCollision)
-        self.remember(old_state, final_move, reward, new_state, isCollision)
+        self.tron_model.train_short_memory(old_state, final_move, reward, new_state, isCollision)
+        self.tron_model.remember(old_state, final_move, reward, new_state, isCollision)
         
-        if isCollision:
-            print("Name:", self.name, "Reward", reward, self.opponent.name, self.opponent.cut_off_reward )
-
-        return isCollision, self.score
+        return isCollision
     
     def train_short_memory(self, state, action, reward, next_state, isCollision):
         self.trainer.train_step(state, action, reward, next_state, isCollision)
@@ -173,6 +175,6 @@ class TronAgent:
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
-            move = torch.argmax(prediction).item()
+            move = int(torch.argmax(prediction).item())
             final_move[move] = 1
         return final_move
