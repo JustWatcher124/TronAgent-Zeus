@@ -1,4 +1,5 @@
 from collections import deque
+import numpy as np
 from settings import MAX_MEMORY, BATCH_SIZE
 import random
 import torch

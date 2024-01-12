@@ -1,4 +1,5 @@
 import pygame
+from gamestate import GameState
 from tronagent import TronAgent
 import math
 from agentconfigs import AGENT_ONE, AGENT_TWO
@@ -17,10 +18,15 @@ class SnakeGameAI:
         self.display = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption('Snake')
         self.clock = pygame.time.Clock()
+
         self.agent_one = TronAgent(AGENT_ONE)
         self.agent_one_wins = 0
+
         self.agent_two = TronAgent(AGENT_TWO)
         self.agent_two_wins = 0
+
+        self.game_state_machine = GameState([self.agent_one, self.agent_two])
+
         self.n_games = 0
         self.winner = ""
         self.game_done = False
@@ -31,10 +37,17 @@ class SnakeGameAI:
         # this could be better lol
         self.game_done = False
         self.winner = ""
-        self.agent_one.reset()
-        self.agent_two.reset()
+
+        self.game_state_machine.reset()
+
         self.agent_one.set_opponent(self.agent_two)
+        self.agent_one.set_game_state_machine(self.game_state_machine)
+        self.agent_one.reset()
+
         self.agent_two.set_opponent(self.agent_one)
+        self.agent_two.set_game_state_machine(self.game_state_machine)
+        self.agent_two.reset()
+
 
         self.score = 0
         self.frame_iteration = 0
@@ -42,8 +55,6 @@ class SnakeGameAI:
             self.n_games = 0.1
         else:
             self.n_games += 1
-
-    
         
     def play_step(self):
         # 1. collect user input
@@ -52,18 +63,16 @@ class SnakeGameAI:
                 pygame.quit()
                 quit()
 
+
         ## START HERE ##
-        agent_one_isCollision = self.agent_one.update(80 - self.n_games)
-        print(self.agent_one.name, agent_one_isCollision)
-        print(self.agent_one.name, self.agent_one_wins)
+        agent_one_isCollision = self.agent_one.update(200 - self.n_games)
         if agent_one_isCollision:
             self.winner = self.agent_two.name
             self.agent_two_wins += 1
             self.game_done = True
 
-        agent_two_isCollision = self.agent_two.update(80 - self.n_games)
-        print(self.agent_two.name, agent_two_isCollision)
-        print(self.agent_two.name, self.agent_two_wins)
+        agent_two_isCollision = self.agent_two.update(200 - self.n_games)
+
         if agent_two_isCollision:
             self.winner = self.agent_one.name
             self.agent_one_wins += 1
@@ -82,6 +91,10 @@ class SnakeGameAI:
             self.reset()
 
         if DEBUG:
+            print(self.agent_one.name, agent_one_isCollision)
+            print(self.agent_one.name, self.agent_one_wins)
+            print(self.agent_two.name, agent_two_isCollision)
+            print(self.agent_two.name, self.agent_two_wins)
             while True:
                 should_break = False
                 text = font.render("Debug", True, WHITE)

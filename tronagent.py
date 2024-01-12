@@ -2,10 +2,8 @@ from tronmodel import TronModel
 from direction import Direction 
 from point import Point
 from collections import deque
-import random
-from settings import BLOCK_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH, MAX_MEMORY, BATCH_SIZE
+from settings import BLOCK_SIZE, DEBUG, SCREEN_HEIGHT, SCREEN_WIDTH, MAX_MEMORY
 import numpy as np
-import torch
 
 class TronAgent:
     def __init__(self, tron_agent_config):
@@ -19,7 +17,6 @@ class TronAgent:
         self.start_y = tron_agent_config.start_y
         self.name = tron_agent_config.name
 
-        # TODO: model, trainer
         self.model = tron_agent_config.model
         self.trainer = tron_agent_config.trainer
 
@@ -36,14 +33,19 @@ class TronAgent:
     def set_opponent(self, opponent):
         self.opponent = opponent
 
+    def set_game_state_machine(self,game_state_machine):
+        self.game_state_machine = game_state_machine
+
     def is_collision(self, pt=None):
         if pt is None:
             pt = self.head
             # hits opponent
-            print("Is collision? at", self.head)
+            if DEBUG:
+                print("Is collision? at", self.head)
             if pt in self.opponent.snake:
                 self.opponent.cut_off_reward = 10
-                print(self.name,"collided with", self.opponent.name, "at", self.head)
+                if DEBUG:
+                    print(self.name,"collided with", self.opponent.name, "at", self.head)
                 return True
         else:
             if pt in self.opponent.snake:
@@ -110,21 +112,6 @@ class TronAgent:
         self.tron_model.remember(old_state, final_move, reward, new_state, isCollision)
         
         return isCollision
-    
-    def train_short_memory(self, state, action, reward, next_state, isCollision):
-        self.trainer.train_step(state, action, reward, next_state, isCollision)
-
-    def remember(self, state, action, reward, next_state, isCollision):
-        self.memory.append((state, action, reward, next_state, isCollision))
-
-    def train_long_memory(self):
-        if len(self.memory) > BATCH_SIZE:
-            mini_sample = random.sample(self.memory, BATCH_SIZE)
-        else:
-            mini_sample = self.memory
-        
-        states, actions, rewards, next_states, dones = zip(*mini_sample)
-        self.trainer.train_step(states, actions, rewards, next_states, dones)
 
     def get_state(self):
         head = self.head
@@ -162,19 +149,10 @@ class TronAgent:
             dir_u,
             dir_d,
         ]
-        
-        return np.array(state, dtype=int)
 
-    def get_action(self, epsilon, state):
-        # Random moves : tradeoff exploration / exploitation
-        self.epsilon = epsilon
-        final_move = [0, 0, 0]
-        if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 2)
-            final_move[move] = 1
-        else:
-            state0 = torch.tensor(state, dtype=torch.float)
-            prediction = self.model(state0)
-            move = int(torch.argmax(prediction).item())
-            final_move[move] = 1
-        return final_move
+        state = np.array(state, dtype=int)
+        game_state = self.game_state_machine.get_game_state()
+
+
+        full_state = np.concatenate((state, game_state))
+        return full_state
