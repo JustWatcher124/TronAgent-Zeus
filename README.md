@@ -8,7 +8,7 @@ Have [Conda](https://www.conda.io/projects/conda/en/latest/user-guide/install/in
 
 Clone this repo and enter to the cloned repo. Then run these commands in the terminal:
 ```bash
-conda-env create -f environment.yml
+conda env create -f environment.yml
 
 conda activate pygame_env
 ```
