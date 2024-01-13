@@ -5,14 +5,21 @@ import os
 
 class Linear_QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size, save_folder):
-        super().__init__()
-        self.linear1 = nn.Linear(input_size, hidden_size)
-        self.linear2 = nn.Linear(hidden_size, output_size)
+        super(Linear_QNet, self).__init__()
+        self.hidden_size = hidden_size
+        self.linear_in = nn.Linear(input_size, hidden_size[0])
+        self.linear_out = nn.Linear(hidden_size[-1], output_size)
         self.save_folder = save_folder
 
     def forward(self, x):
-        x = F.relu(self.linear1(x))
-        x = self.linear2(x)
+        x = F.relu(self.linear_in(x))
+        prev_size = self.hidden_size[0]
+        for size in self.hidden_size[1:]:
+            linear = nn.Linear(prev_size, size)
+            prev_size = size
+            x = linear(x)
+
+        x = self.linear_out(x)
         return x
 
     def save(self, file_name='model.pth'):

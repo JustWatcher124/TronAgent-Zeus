@@ -1,6 +1,6 @@
 from collections import deque
 import numpy as np
-from settings import MAX_MEMORY, BATCH_SIZE
+from settings import DEBUG, MAX_MEMORY, BATCH_SIZE
 import random
 import torch
 
@@ -29,12 +29,15 @@ class TronModel:
     def get_next_move(self, epsilon, state):
         # Random moves : tradeoff exploration / exploitation
         final_move = [0, 0, 0]
-        if random.randint(0, 200) < epsilon:
+        if np.random.rand() < epsilon:
             move = random.randint(0, 2)
             final_move[move] = 1
         else:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
+            if DEBUG:
+                print("TronModel Prediction:", prediction)
+                print("ARGMAX:",torch.argmax(prediction).item())
             move = int(torch.argmax(prediction).item())
             final_move[move] = 1
         return final_move

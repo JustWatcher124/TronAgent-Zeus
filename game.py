@@ -19,6 +19,10 @@ class SnakeGameAI:
         pygame.display.set_caption('Snake')
         self.clock = pygame.time.Clock()
 
+        self.epsilon_min = 0.05 # minimum exploration rate
+        self.epsilon = 1 # initial exploration rate
+        self.epsilon_decay = 0.995
+
         self.agent_one = TronAgent(AGENT_ONE)
         self.agent_one_wins = 0
 
@@ -31,6 +35,10 @@ class SnakeGameAI:
         self.winner = ""
         self.game_done = False
         self.reset()
+
+    def get_epsilon(self):
+        self.epsilon *= self.epsilon_decay
+        self.epsilon = max(self.epsilon, self.epsilon_min)
         
     def reset(self):
         
@@ -63,20 +71,26 @@ class SnakeGameAI:
                 pygame.quit()
                 quit()
 
-
+        self.get_epsilon()
         ## START HERE ##
-        agent_one_isCollision = self.agent_one.update(200 - self.n_games)
+        agent_one_isCollision = self.agent_one.update(self.epsilon)
         if agent_one_isCollision:
             self.winner = self.agent_two.name
             self.agent_two_wins += 1
             self.game_done = True
 
-        agent_two_isCollision = self.agent_two.update(200 - self.n_games)
-
+        agent_two_isCollision = self.agent_two.update(self.epsilon)
         if agent_two_isCollision:
             self.winner = self.agent_one.name
             self.agent_one_wins += 1
             self.game_done = True
+
+            # This is for evenness
+            agent_one_isCollision = self.agent_one.update(self.epsilon)
+            if agent_one_isCollision:
+                self.winner = self.agent_two.name
+                self.agent_two_wins += 1
+                self.game_done = True
 
         # 5. update ui and clock
         self._update_ui()
@@ -91,10 +105,8 @@ class SnakeGameAI:
             self.reset()
 
         if DEBUG:
-            print(self.agent_one.name, agent_one_isCollision)
-            print(self.agent_one.name, self.agent_one_wins)
-            print(self.agent_two.name, agent_two_isCollision)
-            print(self.agent_two.name, self.agent_two_wins)
+            print(self.agent_one.name, "collision:", agent_one_isCollision, "wins:", self.agent_one_wins)
+            print(self.agent_two.name, "collision:", agent_two_isCollision, "wins:", self.agent_two_wins)
             while True:
                 should_break = False
                 text = font.render("Debug", True, WHITE)

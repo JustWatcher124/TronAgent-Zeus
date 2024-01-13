@@ -20,14 +20,14 @@ def get_starting_pos_x(num):
     return math.floor((SCREEN_WIDTH / BLOCK_SIZE) * num) * BLOCK_SIZE
 
 # AGENT1
-AGENT_ONE_LR = 0.001
-AGENT_ONE_GAMMA = 0.9 # not greater than 1
-AGENT_ONE_HIDDEN_SIZE = 256 # hidden layer
+AGENT_ONE_LR = 0.01
+AGENT_ONE_GAMMA = 0.999 # not greater than 1
+AGENT_ONE_HIDDEN_SIZE = [128, 64, 32] # hidden layer
 AGENT_ONE_OUTPUT_SIZE = 3
-AGENT_ONE_INPUT_SIZE = 775
+AGENT_ONE_INPUT_SIZE = 196
 AGENT_ONE_SAVE_FOLDER = './agent_one'
-AGENT_ONE_STARTING_Y = get_starting_pos_y(0.9)
-AGENT_ONE_STARTING_X = get_starting_pos_x(0.40)
+AGENT_ONE_STARTING_Y = get_starting_pos_y(0.1)
+AGENT_ONE_STARTING_X = get_starting_pos_x(0.90)
 
 AGENT_ONE_MODEL = Linear_QNet(
     AGENT_ONE_INPUT_SIZE,
@@ -54,14 +54,14 @@ AGENT_ONE = Agent(
 )
 
 # AGENT2
-AGENT_TWO_LR = 0.001
-AGENT_TWO_GAMMA = 0.9 # not greater than 1
-AGENT_TWO_HIDDEN_SIZE = 256 # hidden layer
+AGENT_TWO_LR = 0.01
+AGENT_TWO_GAMMA = 0.999 # not greater than 1
+AGENT_TWO_HIDDEN_SIZE = [128, 64, 32] # hidden layer
 AGENT_TWO_OUTPUT_SIZE = 3
-AGENT_TWO_INPUT_SIZE = 775
+AGENT_TWO_INPUT_SIZE = 196
 AGENT_TWO_SAVE_FOLDER = './agent_two'
 AGENT_TWO_STARTING_Y = get_starting_pos_y(0.9)
-AGENT_TWO_STARTING_X = get_starting_pos_x(0.6)
+AGENT_TWO_STARTING_X = get_starting_pos_x(0.1)
 
 AGENT_TWO_MODEL = Linear_QNet(
     AGENT_TWO_INPUT_SIZE,

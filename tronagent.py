@@ -40,12 +40,10 @@ class TronAgent:
         if pt is None:
             pt = self.head
             # hits opponent
-            if DEBUG:
-                print("Is collision? at", self.head)
             if pt in self.opponent.snake:
                 self.opponent.cut_off_reward = 10
                 if DEBUG:
-                    print(self.name,"collided with", self.opponent.name, "at", self.head)
+                    print(self.name,"collided at", self.head)
                 return True
         else:
             if pt in self.opponent.snake:
@@ -91,10 +89,7 @@ class TronAgent:
         self.head = Point(x, y)
         self.snake.insert(0, self.head)
 
-    def update(self, eps):
-        epsilon = eps
-        if epsilon < 0:
-            epsilon = 0.01
+    def update(self, epsilon):
 
         old_state = self.get_state()
         final_move = self.tron_model.get_next_move(epsilon, old_state)
@@ -103,10 +98,15 @@ class TronAgent:
         isCollision = False
 
         if self.is_collision():
-            reward = -10
+            reward = -1000
             isCollision = True
+        else:
+            reward = 1
 
         new_state = self.get_state()
+
+        if DEBUG:
+            print(self.name, "reward:", reward)
 
         self.tron_model.train_short_memory(old_state, final_move, reward, new_state, isCollision)
         self.tron_model.remember(old_state, final_move, reward, new_state, isCollision)
@@ -126,23 +126,23 @@ class TronAgent:
         dir_d = self.direction == Direction.DOWN
 
         state = [
-            # Danger straight
-            (dir_r and self.is_collision(point_r)) or
-            (dir_l and self.is_collision(point_l)) or
-            (dir_u and self.is_collision(point_u)) or
-            (dir_d and self.is_collision(point_d)),
-
-            # Danger right
-            (dir_u and self.is_collision(point_r)) or
-            (dir_d and self.is_collision(point_l)) or
-            (dir_l and self.is_collision(point_u)) or
-            (dir_r and self.is_collision(point_d)),
-
-            # Danger left
-            (dir_d and self.is_collision(point_r)) or
-            (dir_u and self.is_collision(point_l)) or
-            (dir_r and self.is_collision(point_u)) or
-            (dir_l and self.is_collision(point_d)),
+            # # Danger straight
+            # (dir_r and self.is_collision(point_r)) or
+            # (dir_l and self.is_collision(point_l)) or
+            # (dir_u and self.is_collision(point_u)) or
+            # (dir_d and self.is_collision(point_d)),
+            #
+            # # Danger right
+            # (dir_u and self.is_collision(point_r)) or
+            # (dir_d and self.is_collision(point_l)) or
+            # (dir_l and self.is_collision(point_u)) or
+            # (dir_r and self.is_collision(point_d)),
+            #
+            # # Danger left
+            # (dir_d and self.is_collision(point_r)) or
+            # (dir_u and self.is_collision(point_l)) or
+            # (dir_r and self.is_collision(point_u)) or
+            # (dir_l and self.is_collision(point_d)),
 
             dir_l,
             dir_r,
@@ -152,7 +152,6 @@ class TronAgent:
 
         state = np.array(state, dtype=int)
         game_state = self.game_state_machine.get_game_state()
-
 
         full_state = np.concatenate((state, game_state))
         return full_state
