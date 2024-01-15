@@ -1,14 +1,8 @@
-from game import SnakeGameAI
-from settings import DEBUG
+from game import Game
 
-def main():
-    game = SnakeGameAI()
-
-    while True:
-        
-        game.play_step()
-        if DEBUG:
-            print("#########################################")
+def main() -> None:
+    game = Game()
+    game.start()
 
 if __name__ == "__main__":
     main()
