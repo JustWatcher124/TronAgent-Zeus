@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from game_object.collision.CollisionSubject import CollisionSubject
 
 class CollisionObserver(ABC):
     """
@@ -7,7 +6,7 @@ class CollisionObserver(ABC):
     """
 
     @abstractmethod
-    def on_collide(self, subject: CollisionSubject) -> None:
+    def on_collide(self, observer) -> None:
         """
         Receive update from subject.
         """

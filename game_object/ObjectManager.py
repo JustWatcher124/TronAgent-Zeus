@@ -4,10 +4,10 @@ from singleton.SingletonMeta import SingletonMeta
 
 
 class ObjectManager(metaclass=SingletonMeta):
-    _game_objects: List[GameObject] = []
+    _game_objects: List[GameObject]
 
     def __init__(self) -> None:
-        pass
+        self._game_objects = []
 
     def attach(self, game_object:GameObject) -> None:
         self._game_objects.append(game_object)

@@ -1,19 +1,29 @@
-from game_object.collision.CollisionObserver import CollisionObserver
-from game_object.collision.CollisionSubject import CollisionSubject
+from typing import List
+from game_object.base.GameObject import GameObject
+from singleton.SingletonMeta import SingletonMeta
 
 
-class CollisionManger(CollisionSubject):
+class CollisionManger(metaclass=SingletonMeta):
 
-    _state: int = 1
-    _observers: list[CollisionObserver] = []
+    _observers: List[GameObject]
 
-    def attach(self, observer: CollisionObserver) -> None:
+    def __init__(self) -> None:
+        self._observers = []
+
+    def attach(self, observer: GameObject) -> None:
         self._observers.append(observer)
 
-    def detach(self, observer: CollisionObserver) -> None:
+    def detach(self, observer: GameObject) -> None:
         self._observers.remove(observer)
 
-    def notify(self) -> None:
+
+    ### POTENTIAL PERFORMANCE BOTTLENECK
+    def check_for_collisions(self) -> None:
         for observer in self._observers:
-            observer.on_collide(self)
+            for observer_collided_with in self._observers:
+                if not observer is observer_collided_with:
+                    if observer.position == observer_collided_with.position:
+                        observer.on_collide(observer_collided_with)
+                
+
 
