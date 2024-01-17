@@ -16,6 +16,8 @@ class CollisionManger(metaclass=SingletonMeta):
     def detach(self, observer: GameObject) -> None:
         self._observers.remove(observer)
 
+    def reset(self) -> None:
+        self._observers = []
 
     ### POTENTIAL PERFORMANCE BOTTLENECK
     def check_for_collisions(self) -> None:

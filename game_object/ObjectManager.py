@@ -19,6 +19,8 @@ class ObjectManager(metaclass=SingletonMeta):
         for observer in self._game_objects:
             observer.update()
 
+    def reset(self) -> None:
+        self._game_objects = []
 
     def get_objects(self) -> List[GameObject]:
         return self._game_objects

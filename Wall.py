@@ -13,4 +13,4 @@ class Wall(GameObject):
         collision_manager.attach(self)
 
     def on_collide(self, observer) -> None:
-        print("my name is", self.name, "and I collided with", observer.name)
+        pass

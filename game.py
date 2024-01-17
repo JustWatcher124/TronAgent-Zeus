@@ -6,10 +6,11 @@ from game_object.CollisionManager import CollisionManger
 from game_object.ObjectManager import ObjectManager
 from settings import FPS
 from screen import Screen
+from singleton.SingletonMeta import SingletonMeta
 
 pygame.init()
 
-class Game:
+class Game(metaclass=SingletonMeta):
     _running: bool
     _clock: Clock
     _screen: Screen
@@ -24,10 +25,18 @@ class Game:
         self._pygame_events = PygameEvents()
         self._object_loader = ObjectLoader()
         self._collision_manager = CollisionManger()
+        self._n_games = 0
+        self._new_game = False
         
     def start(self) -> None:
         self._object_loader.load_objects()
         self._run()
+
+    def reset(self) -> None:
+        self._object_manager.reset()
+        self._collision_manager.reset()
+        self._object_loader.load_objects()
+        self._n_games += 1
 
     def _run(self) -> None:
 
@@ -36,6 +45,10 @@ class Game:
             for event in self._pygame_events.events:
                 if event.type == pygame.QUIT:
                     pygame.quit()
+
+            if self._new_game:
+                self.reset()
+
             self._object_manager.update()
             self._collision_manager.check_for_collisions()
             self._screen.render(self._object_manager)
