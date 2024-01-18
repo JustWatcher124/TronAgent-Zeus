@@ -1,5 +1,6 @@
 from typing import List
 from game_object.base.GameObject import GameObject
+from position import Position
 from singleton.SingletonMeta import SingletonMeta
 
 
@@ -26,6 +27,29 @@ class CollisionManger(metaclass=SingletonMeta):
                 if not observer is observer_collided_with:
                     if observer.position == observer_collided_with.position:
                         observer.on_collide(observer_collided_with)
+
+    def will_be_collision(self, position: Position) -> bool:
+        for observer in self._observers:
+            if position == observer.position:
+                return True
+        return False
                 
+## API
+collision_manager = CollisionManger()
+
+def AttachCollider(game_object: GameObject) -> None:
+    collision_manager.attach(game_object)
+
+def WillBeACollision(position: Position) -> bool:
+    return collision_manager.will_be_collision(position)
+
+def CheckForCollision() -> None:
+    collision_manager.check_for_collisions()
+
+def ResetCollisionManager() -> None:
+    collision_manager.reset()
+    
+
+
 
 

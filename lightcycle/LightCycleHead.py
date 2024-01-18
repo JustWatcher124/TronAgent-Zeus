@@ -1,7 +1,7 @@
 from typing import Tuple
-from InstantiateGameObject import InstantiateGameObject
 from ResetGame import ResetGame
-from game_object.CollisionManager import CollisionManger
+from game_object.CollisionManager import AttachCollider
+from game_object.ObjectManager import , InstantiateObject
 from game_object.base.GameObject import GameObject
 from lightcycle.LightCycleController import LightCycleController
 from lightcycle.LightCycleTail import LightCycleTail
@@ -14,9 +14,7 @@ class LightCycleHead(GameObject):
         super().__init__(position, name, color)
         self._controller = LightCycleController(position)
         
-        # Attach collider
-        collision_manager = CollisionManger()
-        collision_manager.attach(self)
+        AttachCollider(self)
 
         self.tail_length = 0
         self.tail_color = tail_color
@@ -34,7 +32,7 @@ class LightCycleHead(GameObject):
 
     def _spawn_tail(self, position: Position):
 
-        InstantiateGameObject(
+        InstantiateObject(
             LightCycleTail(
                 position,
                 f"{self.name}_tail_{self.tail_length}",

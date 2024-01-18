@@ -34,7 +34,7 @@ class ObjectLoader:
             self._object_manager.attach(
                 Wall(
                     Position(x_top * BLOCK_SIZE, 0),
-                    f"wall_top{x_top}",
+                    f"wall_top_{x_top}",
                     WALL_COLOR_TOP
                 )
             )
@@ -44,7 +44,7 @@ class ObjectLoader:
             self._object_manager.attach(
                 Wall(
                     Position(x_bottom * BLOCK_SIZE + BLOCK_SIZE, y_len * BLOCK_SIZE),
-                    f"wall_bottom{x_bottom}",
+                    f"wall_bottom_{x_bottom}",
                     WALL_COLOR_BOTTOM
                 )
             )
@@ -54,7 +54,7 @@ class ObjectLoader:
             self._object_manager.attach(
                 Wall(
                     Position(x_len * BLOCK_SIZE, y_right * BLOCK_SIZE),
-                    f"wall_right{y_right}",
+                    f"wall_right_{y_right}",
                     WALL_COLOR_RIGHT
                 )
             )
@@ -64,7 +64,7 @@ class ObjectLoader:
             self._object_manager.attach(
                 Wall(
                     Position(0, y_left * BLOCK_SIZE + BLOCK_SIZE),
-                    f"wall_left{y_left}",
+                    f"wall_left_{y_left}",
                     WALL_COLOR_LEFT
                 )
             )

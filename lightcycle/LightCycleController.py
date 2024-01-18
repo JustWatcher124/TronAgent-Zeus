@@ -1,8 +1,9 @@
 from enum import Enum
-import pygame
 from PygameEvents import PygameEvents
+from game_object.CollisionManager import WillBeACollision
 from position import Position
 from settings import BLOCK_SIZE
+import numpy as np
 
 class Direction(Enum):
     RIGHT = 1
@@ -22,19 +23,31 @@ class LightCycleController:
         self._pygame_events = PygameEvents()
         self._direction = Direction.UP
         
-    def _get_dir(self):
-        for event in self._pygame_events.events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                   self._direction = Direction.LEFT
-                elif event.key == pygame.K_RIGHT:
-                   self._direction = Direction.RIGHT
-                elif event.key == pygame.K_UP:
-                   self._direction = Direction.UP
-                elif event.key == pygame.K_DOWN:
-                   self._direction = Direction.DOWN
+    def _get_dir(self) -> None:
+        up = Position(self._x, self._y + BLOCK_SIZE)
+        down = Position(self._x, self._y - BLOCK_SIZE)
+        left = Position(self._x - BLOCK_SIZE, self._y)
+        right = Position(self._x + BLOCK_SIZE, self._y)
+        
+        dirs = [
+            (Direction.UP, WillBeACollision(up)),
+            (Direction.DOWN, WillBeACollision(down)),
+            (Direction.LEFT, WillBeACollision(left)),
+            (Direction.RIGHT, WillBeACollision(right)),
+        ]
+        
+        possible_dirs = []
 
-    def get_position(self):
+        for dir in dirs:
+            if dir[1] != True:
+                possible_dirs.append(dir[0])
+        
+        if self._direction in possible_dirs:
+            return
+        
+        
+
+    def get_position(self) -> Position:
         self._get_dir()
         if self._direction == Direction.RIGHT:
             self._x += BLOCK_SIZE
