@@ -1,8 +1,8 @@
-from game_object.ObjectManager import ObjectManager
+from game_object.ObjectManager import InstantiateObject, ObjectManager
 from position import Position
 from lightcycle.LightCycleHead import LightCycleHead
 from Wall import Wall
-from settings import PLAYER_HEAD_COLOR, PLAYER_TAIL_COLOR, WALL_COLOR_LEFT, WALL_COLOR_RIGHT, WALL_COLOR_BOTTOM, WALL_COLOR_TOP, SCREEN_WIDTH, SCREEN_HEIGHT, BLOCK_SIZE
+from settings import PLAYER_HEAD_COLOR, PLAYER_TAIL_COLOR, PLAYER_TWO_HEAD_COLOR, PLAYER_TWO_TAIL_COLOR, WALL_COLOR_LEFT, WALL_COLOR_RIGHT, WALL_COLOR_BOTTOM, WALL_COLOR_TOP, SCREEN_WIDTH, SCREEN_HEIGHT, BLOCK_SIZE
 
 
 class ObjectLoader:
@@ -13,17 +13,24 @@ class ObjectLoader:
     def load_objects(self) -> None:
         self._load_players()
         self._load_walls()
-        
 
     def _load_players(self) -> None:
-        player_one = LightCycleHead(
-            Position(500, 500), 
-            "player_one", 
-            PLAYER_HEAD_COLOR,
-            PLAYER_TAIL_COLOR
+        InstantiateObject(
+            LightCycleHead(
+                Position(300, 450), 
+                "player_one", 
+                PLAYER_HEAD_COLOR,
+                PLAYER_TAIL_COLOR
+            )
         )
-
-        self._object_manager.attach(player_one)
+        # InstantiateObject(
+        #     LightCycleHead(
+        #         Position(150, 450), 
+        #         "player_two", 
+        #         PLAYER_TWO_HEAD_COLOR,
+        #         PLAYER_TWO_TAIL_COLOR
+        #     )
+        # )
 
     def _load_walls(self) -> None:
         x_len = int(SCREEN_WIDTH / BLOCK_SIZE) - 1

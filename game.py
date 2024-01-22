@@ -4,7 +4,7 @@ from ObjectLoader import ObjectLoader
 from PygameEvents import PygameEvents
 from game_object.CollisionManager import CheckForCollision, ResetCollisionManager
 from game_object.ObjectManager import ResetObjectManager, UpdateObjects
-from settings import FPS
+from settings import DEBUG, FPS
 from screen import Screen
 from singleton.SingletonMeta import SingletonMeta
 
@@ -34,6 +34,21 @@ class Game(metaclass=SingletonMeta):
         ResetCollisionManager()
         self._object_loader.load_objects()
         self._n_games += 1
+        self._new_game = False
+
+    def new_game(self) -> None:
+        self._new_game = True
+
+    def debug(self) -> None:
+        while True:
+            should_break = False
+            self._pygame_events.update()
+            for event in self._pygame_events.events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        should_break = True
+            if should_break:
+                break
 
     def _run(self) -> None:
 
@@ -43,12 +58,14 @@ class Game(metaclass=SingletonMeta):
                 if event.type == pygame.QUIT:
                     pygame.quit()
 
-            if self._new_game:
-                self.reset()
 
             UpdateObjects()
             self._screen.render()
             CheckForCollision()
+            if self._new_game:
+                self.reset()
+            if DEBUG:
+                self.debug()
             self._clock.tick(FPS)
 
         pygame.quit()
