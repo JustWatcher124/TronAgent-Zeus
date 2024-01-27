@@ -1,8 +1,11 @@
-from game import Game
+from env import ENV
+
 
 def main() -> None:
-    game = Game()
-    game.start()
+    env = ENV()
+    env.reset()
+    while True:
+        env.play_step([0, 1, 0],[])
 
 if __name__ == "__main__":
     main()
