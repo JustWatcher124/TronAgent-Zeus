@@ -17,6 +17,7 @@ class ENV:
         self._display = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self._player_reward = 0
         self._game_over = False
+        self.n_games = 1
 
         # set window title
         pygame.display.set_caption("TRON")
@@ -25,6 +26,7 @@ class ENV:
         self.reset()
 
     def reset(self):
+        self.n_games += 1
         
         self._player_direction = Direction.UP
         ## CPU player
@@ -68,11 +70,15 @@ class ENV:
         if collided.player:
             print("Player collided")
             self._game_over = True
+            self._update_ui()
+            self._clock.tick(FPS)
             return self._agent_reward, self._game_over, self._frame_iteration 
         if collided.agent:
             print("Agent collided")
             self._agent_reward = -10
             self._game_over = True
+            self._update_ui()
+            self._clock.tick(FPS)
             return self._agent_reward, self._game_over, self._frame_iteration 
 
         self._update_ui()
@@ -90,7 +96,6 @@ class ENV:
 
     def _get_player_action(self) -> List[int]:
         state = self._get_player_state()
-        random = np.random.rand()
         # if random > 0.01:
         if state[0] == 0:
             return [1, 0, 0]
@@ -140,39 +145,13 @@ class ENV:
         return np.array(state, dtype=int)
     
     def _player_move(self, action: List):
-        # [straight, right, left]
-        clock_wise = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
-        idx = clock_wise.index(self._player_direction)
-
-        if np.array_equal(action, [1, 0, 0]):
-            new_dir = clock_wise[idx] # no change
-        elif np.array_equal(action, [0, 1, 0]):
-            next_idx = (idx + 1) % 4
-            new_dir = clock_wise[next_idx] # right turn r -> d -> l -> u
-        else: # [0, 0, 1]
-            next_idx = (idx - 1) % 4
-            new_dir = clock_wise[next_idx] # left turn r -> u -> l -> d
-
-        self._player_direction = new_dir
-
-        x = self._player_head.x
-        y = self._player_head.y
-        if self._player_direction == Direction.RIGHT:
-            x += BLOCK_SIZE
-        elif self._player_direction == Direction.LEFT:
-            x -= BLOCK_SIZE
-        elif self._player_direction == Direction.DOWN:
-            y += BLOCK_SIZE
-        elif self._player_direction == Direction.UP:
-            y -= BLOCK_SIZE
-
-        self._player_head = Position(x, y)
+        head = self._move(action, self._player_direction, self._player_head)
+        self._player_head = head
         self._player_tail.insert(0,self._player_head)
 
-    def _agent_move(self, action: List):
-        # [straight, right, left]
+    def _move(self, action, dir, head):
         clock_wise = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
-        idx = clock_wise.index(self._agent_direction)
+        idx = clock_wise.index(dir)
 
         if np.array_equal(action, [1, 0, 0]):
             new_dir = clock_wise[idx] # no change
@@ -183,20 +162,26 @@ class ENV:
             next_idx = (idx - 1) % 4
             new_dir = clock_wise[next_idx] # left turn r -> u -> l -> d
 
-        self._agent_direction = new_dir
+        dir = new_dir
 
-        x = self._agent_head.x
-        y = self._agent_head.y
-        if self._agent_direction == Direction.RIGHT:
+        x = head.x
+        y = head.y
+        if dir == Direction.RIGHT:
             x += BLOCK_SIZE
-        elif self._agent_direction == Direction.LEFT:
+        elif dir == Direction.LEFT:
             x -= BLOCK_SIZE
-        elif self._agent_direction == Direction.DOWN:
+        elif dir == Direction.DOWN:
             y += BLOCK_SIZE
-        elif self._agent_direction == Direction.UP:
+        elif dir == Direction.UP:
             y -= BLOCK_SIZE
 
-        self._agent_head = Position(x, y)
+        head = Position(x, y)
+        return head
+
+
+    def _agent_move(self, action: List):
+        head = self._move(action, self._agent_direction, self._agent_head)
+        self._agent_head = head
         self._agent_tail.insert(0,self._agent_head)
 
     def _get_player_state(self):
@@ -283,7 +268,7 @@ class ENV:
         for pt in self._agent_tail:
             pygame.draw.rect(self._display, AGENT_HEAD_COLOR, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
 
-        text = font.render("Score: " + str(self._player_score), True, TEXT)
+        text = font.render("Score: " + str(self.n_games), True, TEXT)
         self._display.blit(text, [0, 0])
         pygame.display.flip()
 

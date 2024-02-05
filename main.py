@@ -8,7 +8,6 @@ def main() -> None:
     plot_mean_scores = []
     total_score = 0
     record = 0
-    n_games = 0
     agent = Agent()
     env = ENV()
     env.reset()
@@ -36,15 +35,13 @@ def main() -> None:
                 record = score
                 agent.model.save()
 
-            print("game: ", n_games, "score: ", score, "record: ", record)
+            print("game: ", env.n_games, "score: ", score, "record: ", record)
 
             plot_scores.append(score)
             total_score += score
-            mean_score = total_score / n_games + 1
+            mean_score = total_score / env.n_games
             plot_mean_scores.append(mean_score)
             plot(plot_scores, plot_mean_scores)
-
-        n_games += 1
 
 if __name__ == "__main__":
     main()

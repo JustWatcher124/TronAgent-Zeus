@@ -3,16 +3,14 @@ from model import Linear_QNet, QTrainer
 import random
 import numpy as np
 import torch
+from settings import EPSILON_DECAY, GAMMA, MAX_MEMORY, BATCH_SIZE, LR, MIN_EPSILON
 
-MAX_MEMORY = 100_000
-BATCH_SIZE = 1000
-LR = 0.001
 
 class Agent:
     def __init__(self) -> None:
         self.n_games = 0
         self.epsilon = 1 # randomness
-        self.gamma = 0.9 # discount rate
+        self.gamma = GAMMA # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
         self.model = Linear_QNet(9, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
@@ -34,10 +32,10 @@ class Agent:
     def train_short_memory(self, state, action, reward, next_state, done):
         self.trainer.train_step(state, action, reward, next_state, done)
     def epsilon_decay(self):
-        if self.epsilon <= 0.01:
-            self.epsilon = 0.01
+        if self.epsilon <= MIN_EPSILON:
+            self.epsilon = MIN_EPSILON 
         else:
-            self.epsilon *= 0.9995
+            self.epsilon *= EPSILON_DECAY
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
