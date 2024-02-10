@@ -1,6 +1,9 @@
+import pygame
 from agent import Agent
 from env import ENV
 from plot import plot
+from settings import DEBUG
+import numpy as np
 
 
 def main() -> None:
@@ -27,6 +30,20 @@ def main() -> None:
 
         agent.remember(state_old, final_move, reward, state_new, done)
 
+        if DEBUG:
+            while True:
+                should_break = False
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            should_break = True
+                        print(np.array(state_old).reshape((5,5)))
+                        print(final_move)
+                        print(np.array(state_new).reshape((5,5)))
+                        print(reward,done)
+                if should_break:
+                    break
+
         if done:
             env.reset()
             agent.train_long_memory()
@@ -35,7 +52,7 @@ def main() -> None:
                 record = score
                 agent.model.save()
 
-            print("game: ", env.n_games, "score: ", score, "record: ", record)
+            # print("game: ", env.n_games, "score: ", score, "record: ", record)
 
             plot_scores.append(score)
             total_score += score

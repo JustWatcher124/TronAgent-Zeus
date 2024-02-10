@@ -12,7 +12,7 @@ class Agent:
         self.epsilon = 1 # randomness
         self.gamma = GAMMA # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(9, 256, 3)
+        self.model = Linear_QNet(25, 256, 4)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def remember(self, state, action, reward, next_state, done):
@@ -36,11 +36,12 @@ class Agent:
             self.epsilon = MIN_EPSILON 
         else:
             self.epsilon *= EPSILON_DECAY
+        print(self.epsilon)
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
         self.epsilon_decay()
-        final_move = [0,0,0]
+        final_move = [0, 0, 0, 0]
         if np.random.random() < self.epsilon:
             move = np.random.randint(0, 3)
             final_move[move] = 1
