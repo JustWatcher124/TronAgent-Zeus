@@ -1,7 +1,9 @@
 # Tron Agents
 
-This program simulates a game of Tron where one player is controlled by a machine learning (ML) agent and the other 
-by a procedural computer player, utilizing PyTorch and Deep QNet learning.
+This program simulates a game of Tron where one player is controlled by a machine learning (Blue) agent and the other 
+by a procedural computer player (Red), utilizing PyTorch and Deep QNet learning. 
+
+![a gif of a couple matches after over 1000 rounds of training](./tron-agent.gif)
 
 ### Methods
 
@@ -13,10 +15,10 @@ is not possible, the CPU randomly decides to turn either left or right.
 
 #### Hyper parameters
 
-gamma: 0.999
-learning rate: 0.001 using the Adam optimizer
-minimum epsilon 0.001
-epsilon decay rate per game: 0.995
+- gamma: 0.999
+- learning rate: 0.001 using the Adam optimizer
+- minimum epsilon 0.001
+- epsilon decay rate per game: 0.995
 
 #### Neural network architecture
 
