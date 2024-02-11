@@ -40,7 +40,6 @@ class Agent:
 
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
-        self.epsilon_decay()
         final_move = [0, 0, 0, 0]
         if np.random.random() < self.epsilon:
             move = np.random.randint(0, 3)

@@ -3,24 +3,41 @@
 This program simulates a game of Tron where one player is controlled by a machine learning (ML) agent and the other 
 by a procedural computer player, utilizing PyTorch and Deep QNet learning.
 
-### Methodology
+### Methods
 
-The program employs QNet learning, a form of reinforcement learning. The environment provides a 3x3 vision grid 
-centered around the ML agent's position, enabling the model to limitedly anticipate potential threats.
+The program employs QNet learning, a form of reinforcement learning. The environment provides a 5x5 vision grid 
+centered around the ML agent's position, enabling the model to anticipate potential threats.
 
 The CPU player is programmed to move forward unless doing so would lead to a collision. In cases where moving straight 
 is not possible, the CPU randomly decides to turn either left or right.
 
+#### Hyper parameters
+
+gamma: 0.999
+learning rate: 0.001 using the Adam optimizer
+minimum epsilon 0.001
+epsilon decay rate per game: 0.995
+
+#### Neural network architecture
+
+The neural network has 25 input nodes, one hidden layer with 256 nodes and an output layer with 4 nodes corresponding
+to 4 directions (left, right, up, down).
+
+#### Training
+
+The model has a max replay memory buffer of 100 000 and it trains in batch sizes of 1000.
+
 ### Highlights
 
-After approximately 300 games, the ML agent begins to surpass the CPU player, primarily due to the simplistic 
-strategy employed by the CPU player.
+After approximately 900 games or when the epsilon is sufficiently low for the model to be exploitive the vast majority of the time, 
+the ML agent begins to surpass the CPU player, primarily due to the simplistic strategy employed by the CPU player.
 
 ### In conclusion
 
-Neural networks pose significant challenges in terms of debugging and interpretation. To enhance the model's
-performance, I'd like to implement a 5x5 vision grid, allowing for more advanced planning. Additionally, 
-introducing a more sophisticated CPU player could further test the ML agent's capabilities.
+I had a hard time choosing the right information for the "environment" to expose to the model. I originally
+was only passing in 3 values in an array like this: [danger straight, safe left, safe right] in reality this is something like
+[1, 0, 0]. This was fine, but the model would walk right into a corner or trap itself somehow. So after doing some research I got the idea of
+vision grids from a paper out of a university in Amsterdam. This significantly improved the model's ability to not get trapped, and improved the overall survival time.
 
 ### Game customization
 

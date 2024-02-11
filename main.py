@@ -45,6 +45,7 @@ def main() -> None:
                     break
 
         if done:
+            agent.epsilon_decay()
             env.reset()
             agent.train_long_memory()
 
