@@ -19,7 +19,7 @@ class Agent:
         self.memory.append((state, action, reward, next_state, done)) # popleft if MAX_MEMORY is reached
 
     def train_long_memory(self):
-        if len(self.memory) > BATCH_SIZE:
+        if len(self.memory) > BATCH_SIZE:  # don't let max long memory get too large
             mini_sample = random.sample(self.memory, BATCH_SIZE) # list of tuples
         else:
             mini_sample = self.memory
@@ -31,6 +31,7 @@ class Agent:
 
     def train_short_memory(self, state, action, reward, next_state, done):
         self.trainer.train_step(state, action, reward, next_state, done)
+
     def epsilon_decay(self):
         if self.epsilon <= MIN_EPSILON:
             self.epsilon = MIN_EPSILON 

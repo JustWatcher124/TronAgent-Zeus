@@ -8,7 +8,7 @@ import numpy as np
 import math
 import random
 
-from settings import AGENT_HEAD_COLOR, BACKGROUND_COLOR, BLOCK_SIZE, FPS, PLAYER_HEAD_COLOR, SCREEN_HEIGHT, SCREEN_WIDTH, TEXT
+from settings import AGENT_HEAD_COLOR, BACKGROUND_COLOR, BLOCK_SIZE, FPS, PLAYER_HEAD_COLOR, SCREEN_HEIGHT, SCREEN_WIDTH, TEXT, PLAYER_COLOR, AGENT_COLOR
 
 pygame.init()
 font = pygame.font.Font(size=25)
@@ -27,7 +27,7 @@ class ENV:
         self._clock = pygame.time.Clock()
         self.reset()
 
-    def reset(self):
+    def reset(self):  # starts the environment
         directions = [Direction.UP, Direction.DOWN, Direction.RIGHT, Direction.LEFT]
         player_positions = [0.25, 0.5, 0.75]
         self.n_games += 1
@@ -91,13 +91,14 @@ class ENV:
 
         return self._agent_reward, self._game_over, self._frame_iteration
 
-    def _pick_random_turn(self):
-        rand = np.random.randint(0,2)
-        if rand:
-            return [0, 1, 0]
-        else:
-            return [0, 0, 1]
-
+    # unused
+    # def _pick_random_turn(self):
+    #     rand = np.random.randint(0,2)
+    #     if rand:
+    #         return [0, 1, 0]
+    #     else:
+    #         return [0, 0, 1]
+    # ---
     def _get_player_action(self) -> List[int]:
         state = self._get_player_state()
         # if random > 0.01:
@@ -115,7 +116,7 @@ class ENV:
                 else:
                     return [0, 1, 0]
     
-    def get_agent_state(self):
+    def get_agent_state(self):  # gets the 25 long input data (5x5 centered around agent head) for ML input - pygame version
         radius = 2
 
         starting_x = BLOCK_SIZE * -radius + self._agent_head.x 
@@ -131,30 +132,7 @@ class ENV:
             for j in range(starting_x, ending_x, BLOCK_SIZE):
                 position = Position(j, i)
                 state.append(self._agent_pt_will_collide(position))
-        # print("state_alg", np.array(state, dtype=int).reshape(3, 3))
-        #
-        # pos_l = Position(self._agent_head.x - BLOCK_SIZE, self._agent_head.y)
-        # pos_lu = Position(self._agent_head.x - BLOCK_SIZE, self._agent_head.y - BLOCK_SIZE)
-        # pos_ld = Position(self._agent_head.x - BLOCK_SIZE, self._agent_head.y + BLOCK_SIZE)
-        # pos_r = Position(self._agent_head.x + BLOCK_SIZE, self._agent_head.y)
-        # pos_ru = Position(self._agent_head.x + BLOCK_SIZE, self._agent_head.y - BLOCK_SIZE)
-        # pos_rd = Position(self._agent_head.x + BLOCK_SIZE, self._agent_head.y + BLOCK_SIZE)
-        # pos_d = Position(self._agent_head.x, self._agent_head.y + BLOCK_SIZE)
-        # pos_u = Position(self._agent_head.x, self._agent_head.y - BLOCK_SIZE)
-        # pos = Position(self._agent_head.x, self._agent_head.y)
-        #
-        # state = [
-        #     self._agent_pt_will_collide(pos_lu),
-        #     self._agent_pt_will_collide(pos_u),
-        #     self._agent_pt_will_collide(pos_ru),
-        #     self._agent_pt_will_collide(pos_l),
-        #     self._agent_pt_will_collide(pos),
-        #     self._agent_pt_will_collide(pos_r),
-        #     self._agent_pt_will_collide(pos_ld),
-        #     self._agent_pt_will_collide(pos_d),
-        #     self._agent_pt_will_collide(pos_rd),
-        # ]
-        # print("state_dec", np.array(state, dtype=int).reshape(3, 3))
+        
 
         return np.array(state, dtype=int)
     
@@ -307,9 +285,13 @@ class ENV:
     def _update_ui(self):
         self._display.fill(BACKGROUND_COLOR)
 
-        for pt in self._player_tail:
+        for pt in self._player_tail[1:]:
+            pygame.draw.rect(self._display, PLAYER_COLOR, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
+        for pt in self._player_tail[:1]:
             pygame.draw.rect(self._display, PLAYER_HEAD_COLOR, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
-        for pt in self._agent_tail:
+        for pt in self._agent_tail[1:]:
+            pygame.draw.rect(self._display, AGENT_COLOR, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
+        for pt in self._agent_tail[:1]:
             pygame.draw.rect(self._display, AGENT_HEAD_COLOR, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
 
         text = font.render("Number of Games: " + str(self.n_games), True, TEXT)
