@@ -2,3 +2,4 @@ __pycache__
 .old_game
 .newer_old_game
 model
+.spyproject/
