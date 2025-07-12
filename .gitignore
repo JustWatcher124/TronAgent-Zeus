@@ -3,3 +3,4 @@ __pycache__
 .newer_old_game
 model
 .spyproject/
+!modelsaves/*200.pth
