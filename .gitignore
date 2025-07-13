@@ -10,3 +10,6 @@ matchmaking_screens/*
 temp_videos/
 videos/*
 !videos/GA_NPNET_5x5_vs_RL_7x7.mp4
+demo.py
+demo_output/*
+videos_demo/
