@@ -1,3 +1,5 @@
+## this file contains sample outputs from matchmaking.py
+
 Final Rankings (by total wins):
 1. RL_7x7 - 158 pts
 2. RL_5x5 - 145 pts
