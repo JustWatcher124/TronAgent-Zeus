@@ -61,7 +61,7 @@ def main(p1, p2, episodes=200, render=False, render_fps=50):
             if render:
                 draw_grid(screen, env.grid, cell_size)
                 pygame.display.flip()
-                clock.tick(FPS)
+                clock.tick(env.fps)
     if p1.can_train():
         p1.save_model(episode)
     if p2.can_train():
