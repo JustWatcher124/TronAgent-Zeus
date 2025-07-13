@@ -22,12 +22,15 @@ This project is based on [IsaiahPaget/TronAgent](https://github.com/IsaiahPaget/
 
 ## Setup
 
+> Note: This code was written with python version 3.11.12  
+> newer versions might work, but you will have to test that out.
+
 ```bash
 git clone https://github.com/JustWatcher124/TronAgent-Zeus.git
 cd TronAgent-Zeus
 pip install -r requirements.txt
 ```
-### To play (stub)
+### To play
 ```bash
 python play_main.py
 ```
