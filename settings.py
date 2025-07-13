@@ -1,3 +1,7 @@
+# some of these are not necessary anymore, some are
+# just don't change the values in here
+# use hard-coded values if you want, or add some values here to use them
+
 MAX_MEMORY = 100_000
 BATCH_SIZE = 100  # numer of games
 SCREEN_WIDTH = 1000
