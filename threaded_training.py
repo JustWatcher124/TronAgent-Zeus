@@ -4,6 +4,8 @@ from main import main
 from main import ga_main
 from main import GRID_WIDTH, GRID_HEIGHT
 
+
+# example configs
 configs = [
     {"name": "RL_5x5", "input_size": 25, "subgrid_size": 5},
     {"name": "RL_7x7", "input_size": 49, "subgrid_size": 7},
@@ -42,6 +44,7 @@ def run_training_threaded(config):
 
 def run_ga_training_threaded():
     threads = []
+    # change ga_configs for npnet_configs if you want to use the npnet individual
     for cfg in ga_configs:
         p1 = GAPlayer(name=cfg["name"], input_size=cfg["input_size"], subgrid_size=cfg["subgrid_size"])
         p2 = ScriptedPlayerV2(name="ScriptedP2")
