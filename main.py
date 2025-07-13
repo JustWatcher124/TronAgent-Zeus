@@ -15,8 +15,8 @@ GRID_WIDTH = 50
 GRID_HEIGHT = 50
 
 
-def main(p1, p2, episodes=200, render=False):
-    env = BaseEnv(width=GRID_WIDTH, height=GRID_HEIGHT)
+def main(p1, p2, episodes=200, render=False, render_fps=50):
+    env = BaseEnv(width=GRID_WIDTH, height=GRID_HEIGHT, fps=render_fps)
     if render:
         pygame.init()
         cell_size = min(SCREEN_SIZE // env.width, SCREEN_SIZE // env.height)
