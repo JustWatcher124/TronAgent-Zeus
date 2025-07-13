@@ -10,6 +10,9 @@ import random
 
 
 class RLPlayer(Player):
+    """
+    Reinforcement Learning player using a linear Q-network and experience replay.
+    """
     def __init__(self, name="RLAgent", input_size=25, subgrid_size=5):
         super().__init__(name)
         self.input_size = input_size
@@ -22,6 +25,9 @@ class RLPlayer(Player):
         self.subgrid_size = subgrid_size
 
     def _extract_state(self, grid, head: Position):
+        """
+        Extracts a centered subgrid around the agent's head. Pads if near edges.
+        """
         if self.subgrid_size is None:
             return grid.flatten()
         if self.subgrid_size ** 2 != self.input_size:
@@ -57,6 +63,9 @@ class RLPlayer(Player):
         
 
     def get_action(self, grid, head: Position, _):
+        """
+        Selects an action using ε-greedy policy over predicted Q-values.
+        """
         state = self._extract_state(grid, head)
         final_move = [0, 0, 0]
         if np.random.rand() < self.epsilon:
@@ -70,11 +79,17 @@ class RLPlayer(Player):
         return final_move
 
     def remember(self, state, head, next_head, action, reward, next_state, done):
+        """
+        Stores a transition in memory for experience replay.
+        """
         _state = self._extract_state(state, head)
         _next_state = self._extract_state(next_state, next_head)
         self.memory.append((_state, action, reward, _next_state, done))
 
     def train(self):
+        """
+        Samples from memory and performs a training step.
+        """
         if len(self.memory) > BATCH_SIZE:
             mini_sample = random.sample(self.memory, BATCH_SIZE)
         else:
@@ -83,16 +98,27 @@ class RLPlayer(Player):
         states, actions, rewards, next_states, dones = zip(*mini_sample)
         try:
             self.trainer.train_step(states, actions, rewards, next_states, dones)
-        except ValueError:
+        except ValueError:  # debugging
             print(self.name, 'states', set([state.shape for state in states]))
             print(self.name, 'next_states', set([state.shape for state in next_states]))
+
+
     def train_short(self, state, action, reward, next_state, done):
+        """
+        Perform a training step on a single transition (optional real-time use).
+        """
         self.trainer.train_step(state, action, reward, next_state, done)
 
     def decay_epsilon(self):
+        """
+        Decays ε for less exploration over time.
+        """
         self.epsilon = max(self.epsilon * EPSILON_DECAY, MIN_EPSILON)
 
     def reset(self):
+        """
+        Called at episode end; increments game counter and decays ε.
+        """
         self.n_games += 1
         self.decay_epsilon()
 
@@ -100,6 +126,9 @@ class RLPlayer(Player):
         return True
     
     def save_model(self, episode, file_name=None):
+        """
+        Saves the model's parameters to disk.
+        """
         if file_name is None:
             file_name = f"{self.name}_input{self.input_size}_episode{episode}.pth"
         # file_name += f''

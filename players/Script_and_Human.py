@@ -1,28 +1,30 @@
 from collections import deque
-
 from settings import *
 import pygame
 from position import Position
 from direction import Direction
 from .BasePlayer import Player
-
 import numpy as np
-# from player import Player
-# from direction import Direction
-# from position import Position
 import random
 
 
 
 class HumanPlayer(Player):
+    """
+    Human-controlled player using keyboard input (LEFT/RIGHT arrows)
+    Info: With High Framerates this becomes essentially unplayable.
+    """
     def __init__(self, name="You"):
         super().__init__(name)
 
     def get_action(self, state, position: Position, _):
+        """
+        Returns an action based on current keyboard state.
+        """
         keys = pygame.key.get_pressed()
 
-        # Default: go straight
-        action = [1, 0, 0]
+        
+        action = [1, 0, 0]  # default: go straight
 
         if keys[pygame.K_RIGHT]:
             action = [0, 1, 0]  # turn right
@@ -33,15 +35,23 @@ class HumanPlayer(Player):
 
 
 class ScriptedPlayer(Player):
+    """
+    Basic scripted player that always moves forward.
+    """
     def __init__(self, name="ForwardBot"):
         super().__init__(name)
 
     def get_action(self, state, position: Position, _):
-        # print(state)
+        """
+        Always moves forward.
+        """
         return [1, 0, 0]  # always forward
 
 
 class ScriptedPlayerV2(Player):
+    """
+    Scripted player that dodges obstacles by turning randomly when blocked.
+    """
     def __init__(self, name="Dodger", direction='right'):
         super().__init__(name)
         if direction == 'right':
@@ -50,6 +60,9 @@ class ScriptedPlayerV2(Player):
             self.direction = Direction.LEFT
 
     def get_action(self, state, position: Position, direction: Direction):
+        """
+        If obstacle is ahead, turns randomly left or right. Otherwise, moves forward.
+        """
         x, y = position.x, position.y
         height, width = state.shape
         ahead = self._get_relative_position(position, direction)
@@ -63,7 +76,7 @@ class ScriptedPlayerV2(Player):
             action = [1, 0, 0]
 
         return action
-    def _get_relative_position(self, pos, direction):
+    def _get_relative_position(self, pos, direction):  # helper function for the collision avoidance
         if direction == Direction.RIGHT:
             return Position(pos.x + 1, pos.y)
         elif direction == Direction.LEFT:

@@ -4,6 +4,9 @@ from position import Position
 from direction import Direction
 
 class GAPlayer(Player):
+    """
+    Genetic Algorithm-based player that evolves a population of neural network agents.
+    """
     def __init__(self, name="GeneticAgent", input_size=25, subgrid_size=5, hidden_size=16, output_size=3, population_size=50):
         super().__init__(name)
         self.population_size = population_size
@@ -21,6 +24,9 @@ class GAPlayer(Player):
         self.subgrid_size = subgrid_size
 
     def _extract_state(self, grid, head: Position):
+        """
+        Extracts a centered subgrid around the head. Pads if near edge.
+        """
         if self.subgrid_size is None:
             return grid.flatten()
         if self.subgrid_size ** 2 != self.input_size:
@@ -55,6 +61,9 @@ class GAPlayer(Player):
         return padded_grid.flatten()
 
     def get_action(self, state, head: Position, _):
+        """
+        Returns an action from the current individual based on state.
+        """
         state = self._extract_state(state, head)
         ind = self.population[self.current_index]
         move = ind.forward(state)
@@ -63,16 +72,21 @@ class GAPlayer(Player):
         return action
 
     def remember(self, reward, done):
+        """
+        Updates fitness of current individual and rotates to next on episode end.
+        """
         self.population[self.current_index].fitness += reward
         if done:
             self.current_index = (self.current_index + 1) % self.population_size
             self.total_games += 1
 
     def evolve(self):
+        """
+        Evolves the population using crossover and mutation on the fittest individuals.
+        """
         self.population.sort(key=lambda ind: ind.fitness, reverse=True)
         survivors = self.population[:self.population_size // 2]
-        # print("Best Individual Fitness:", survivors[0].fitness)
-
+        
         new_population = [ind.clone() for ind in survivors]
         while len(new_population) < self.population_size:
             p1, p2 = random.sample(survivors, 2)
@@ -86,22 +100,28 @@ class GAPlayer(Player):
             ind.fitness = 0.0
 
     def _crossover(self, p1, p2):
+        """
+        Creates a new individual by blending weights from two parents.
+        """
         alpha = np.random.rand(len(p1.weights))
         child = p1.clone()
         child.weights = alpha * p1.weights + (1 - alpha) * p2.weights
         return child
 
     def _mutate(self, individual, mutation_rate=0.05):
+        """
+        Applies random Gaussian mutation to individual weights.
+        """
         mask = np.random.rand(*individual.weights.shape) < mutation_rate
         individual.weights += np.random.randn(*individual.weights.shape) * mask
 
     def train(self):
+        """
+        Evolves the population if enough games were played.
+        """
         if self.can_evolve():
             self.evolve()
             self.total_games = 0
-
-    def reset(self):
-        pass
 
     def can_train(self):
         return True
@@ -110,6 +130,9 @@ class GAPlayer(Player):
         return self.total_games >= self.games_per_generation
     
     def save_model(self, generation, file_name=None):
+        """
+        Saves the full GAPlayer object using pickle.
+        """
         model_folder_path = 'modelsaves'
         if file_name is None:
             file_name = f"{self.name}_input{self.input_size}_generation{generation}.pkl"
@@ -121,8 +144,9 @@ class GAPlayer(Player):
 
     @staticmethod
     def load_model(file_name):
-        # model_folder_path = ''
-        # file_name = os.path.join(model_folder_path, file_name)
+        """
+        Loads a GAPlayer object from file.
+        """
         with open(file_name, 'rb') as f:
             return pickle.load(f)
 
