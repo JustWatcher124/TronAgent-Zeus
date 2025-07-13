@@ -5,3 +5,4 @@ model
 .spyproject/
 modelsaves/*
 !modelsaves/*200.pth
+matchmaking_screens/*
