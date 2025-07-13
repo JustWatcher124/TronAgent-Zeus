@@ -6,3 +6,6 @@ model
 modelsaves/*
 !modelsaves/*200.pth
 matchmaking_screens/*
+temp_videos/
+videos/*
+!videos/GA_NPNET_5x5_vs_RL_7x7.mp4
