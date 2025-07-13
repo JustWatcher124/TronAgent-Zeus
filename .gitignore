@@ -5,6 +5,7 @@ model
 .spyproject/
 modelsaves/*
 !modelsaves/*200.pth
+!modelsaves/*200.pkl
 matchmaking_screens/*
 temp_videos/
 videos/*
