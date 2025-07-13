@@ -1,6 +1,15 @@
 import numpy as np
 from position import Position
 from direction import Direction
+import pygame
+
+COLOR_MAP = {
+    0: (66, 66, 66),     # Empty
+    1: (255, 64, 64),    # Player1 head
+    2: (255, 20, 20),    # Player1 tail
+    3: (64, 255, 64),    # Player2 head
+    4: (20, 20, 255),    # Player2 tail
+}
 
 EMPTY = 0
 P1_HEAD = 1
@@ -11,11 +20,12 @@ P2_TAIL = 4
 DIRECTIONS = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
 
 class BaseEnv:
-    def __init__(self, width=25, height=25, random_spawn=False):
+    def __init__(self, width=25, height=25, random_spawn=False, fps=50):
         self.width = width
         self.height = height
         self.grid = np.zeros((height, width), dtype=np.uint8)
         self.random_spawn = random_spawn
+        self.fps = fps
         self.reset()
 
     def reset(self):
@@ -140,3 +150,13 @@ class BaseEnv:
         if head in own_tail[1:] or head in other_tail:
             return True
         return False
+
+def draw_grid(screen, grid, cell_size, frame_number=None):
+    screen.fill((66, 66, 66))
+    h, w = grid.shape
+    for y in range(h):
+        for x in range(w):
+            value = grid[y, x]
+            color = COLOR_MAP.get(value, (0, 0, 0))
+            rect = pygame.Rect(x * cell_size, y * cell_size, cell_size, cell_size)
+            pygame.draw.rect(screen, color, rect)

@@ -1,144 +1,20 @@
-import numpy as np
+from individuals import *
 from .BasePlayer import Player
 from position import Position
-import random
-
-import numpy as np
-from .BasePlayer import Player
-from position import Position
-import random
-import os
-
-import tempfile
-
-
-from tensorflow.keras.models import Sequential, clone_model, load_model
-from tensorflow.keras.layers import Dense, Input
-import pickle
-
-
-class Individual:
-    def __init__(self, input_size, hidden_size, output_size):
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.output_size = output_size
-        self.weights = self._init_weights()
-        self.fitness = 0.0
-
-    def _init_weights(self):
-        total_weights = (self.input_size + 1) * self.hidden_size + (self.hidden_size + 1) * self.output_size
-        return np.random.randn(total_weights)
-
-    def clone(self):
-        clone = Individual(self.input_size, self.hidden_size, self.output_size)
-        clone.weights = np.copy(self.weights)
-        return clone
-
-    def forward(self, state):
-        idx = 0
-        W1 = self.weights[idx:idx + self.input_size * self.hidden_size].reshape(self.input_size, self.hidden_size)
-        idx += self.input_size * self.hidden_size
-        b1 = self.weights[idx:idx + self.hidden_size]
-        idx += self.hidden_size
-        W2 = self.weights[idx:idx + self.hidden_size * self.output_size].reshape(self.hidden_size, self.output_size)
-        idx += self.hidden_size * self.output_size
-        b2 = self.weights[idx:idx + self.output_size]
-
-        x = np.array(state).flatten()
-        x = np.tanh(np.dot(x, W1) + b1)
-        x = np.dot(x, W2) + b2
-        return np.argmax(x)
-
-class KerasIndividual:
-    def __init__(self, input_size, hidden_size, output_size, weights=None):
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.output_size = output_size
-        self.model = Sequential([
-            Input((input_size,)),
-            Dense(hidden_size, activation='tanh'),
-            Dense(output_size)
-        ])
-        if weights is not None:
-            self.set_weights_flat(weights)
-        self.fitness = 0.0
-
-    @property
-    def weights(self):
-        return self.get_weights_flat()
-
-    @weights.setter
-    def weights(self, value):
-        self.set_weights_flat(value)
-
-    def forward(self, state):
-        x = np.array(state).reshape(1, -1)
-        output = self.model(x, training=False).numpy().flatten()
-        return np.argmax(output)
-
-    def get_weights_flat(self):
-        weights = self.model.get_weights()
-        return np.concatenate([w.flatten() for w in weights])
-
-    def set_weights_flat(self, flat_weights):
-        shapes = [w.shape for w in self.model.get_weights()]
-        new_weights = []
-        idx = 0
-        for shape in shapes:
-            size = np.prod(shape)
-            new_weights.append(flat_weights[idx:idx + size].reshape(shape))
-            idx += size
-        self.model.set_weights(new_weights)
-
-    def clone(self):
-        clone = KerasIndividual(self.input_size, self.hidden_size, self.output_size)
-        clone.set_weights_flat(self.get_weights_flat())
-        return clone
-
-    # def __getstate__2(self):
-    #     state = self.__dict__.copy()
-    #     # Save model to bytes using temporary file
-    #     with tempfile.NamedTemporaryFile(delete=False, suffix='.keras') as tmp:
-    #         self.model.save(tmp.name)
-    #         with open(tmp.name, 'rb') as f:
-    #             state['model_bytes'] = f.read()
-    #     state.pop('model')
-    #     return state
-    
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state['model_json'] = self.model.to_json()
-        state['model_weights'] = self.model.get_weights()
-        del state['model']
-        return state
-    
-    def __setstate__(self, state):
-        from tensorflow.keras.models import model_from_json
-        model = model_from_json(state['model_json'])
-        model.set_weights(state['model_weights'])
-        state.pop('model_json')
-        state.pop('model_weights')
-        self.__dict__.update(state)
-        self.model = model
-
-    # def __setstate__2(self, state):
-    #     model_bytes = state.pop('model_bytes')
-    #     with tempfile.NamedTemporaryFile(delete=False, suffix='.h5') as tmp:
-    #         tmp.write(model_bytes)
-    #         tmp.flush()
-    #         from tensorflow.keras.models import load_model
-    #         model = load_model(tmp.name)
-    #     self.__dict__.update(state)
-    #     self.model = model
+from direction import Direction
 
 class GAPlayer(Player):
     def __init__(self, name="GeneticAgent", input_size=25, subgrid_size=5, hidden_size=16, output_size=3, population_size=50):
         super().__init__(name)
         self.population_size = population_size
+        
+        # change this line to any of the individuals in the __init__.py all list - you maybe need to change the values given to the init of that class
+        self.population = [KerasIndividual(input_size, hidden_size, output_size) for _ in range(population_size)]
+        
+        
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size
-        self.population = [KerasIndividual(input_size, hidden_size, output_size) for _ in range(population_size)]
         self.current_index = 0
         self.total_games = 0
         self.games_per_generation = 100  # can be tuned

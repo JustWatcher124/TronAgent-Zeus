@@ -1,7 +1,7 @@
 import threading
 from players import RLPlayer, ScriptedPlayerV2, GAPlayer
-from threaded_main import threaded_main as main
-from threaded_main import threaded_ga_main as ga_main
+from main import main 
+from main import ga_main
 from main import GRID_WIDTH, GRID_HEIGHT
 
 configs = [
@@ -54,6 +54,7 @@ def run_ga_training_threaded():
 
 
 if __name__ == "__main__":
-    run_ga_training_threaded()
+    # run_ga_training_threaded()
+    run_training_threaded()
 
 

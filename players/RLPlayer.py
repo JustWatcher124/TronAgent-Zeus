@@ -8,24 +8,6 @@ import torch
 import numpy as np
 import random
 
-from model import Linear_QNet, QTrainer
-from settings import *
-from position import Position
-from .BasePlayer import Player
-from collections import deque
-import torch
-import numpy as np
-import random
-
-from model import Linear_QNet, QTrainer
-from settings import *
-from position import Position
-from .BasePlayer import Player
-from collections import deque
-import torch
-import numpy as np
-import random
-import math
 
 class RLPlayer(Player):
     def __init__(self, name="RLAgent", input_size=25, subgrid_size=5):
