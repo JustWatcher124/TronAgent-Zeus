@@ -1,63 +1,37 @@
-# Tron Agents
+# Tron: Zeus
 
-This program simulates a game of Tron where one player is controlled by a machine learning (Blue) agent and the other 
-by a procedural computer player (Red), utilizing PyTorch and Deep QNet learning. 
+> A modular reinforcement-learning framework for training and evaluating agents in a grid-based Tron-like game.
 
-![a gif of a couple matches after over 1000 rounds of training](./tron-agent.gif)
+## Disclaimer
 
-### Methods
+This project is based on [IsaiahPaget/TronAgent](https://github.com/IsaiahPaget/TronAgent), but has been heavily modified and extended. Please credit the original author accordingly.
 
-The program employs QNet learning, a form of reinforcement learning. The environment provides a 5x5 vision grid 
-centered around the ML agent's position, enabling the model to anticipate potential threats.
+## Purpose
 
-The CPU player is programmed to move forward unless doing so would lead to a collision. In cases where moving straight 
-is not possible, the CPU randomly decides to turn either left or right.
+1. Provide a system for training ML models using Reinforcement Learning.
+2. Offer a modular and extensible architecture to plug in custom models.
+3. Support gameplay against both ML agents and rule-based opponents.
 
-#### Hyper parameters
+## Major Enhancements
 
-- gamma: 0.999
-- learning rate: 0.001 using the Adam optimizer
-- minimum epsilon 0.001
-- epsilon decay rate per game: 0.995
+- Decoupled the game logic from PyGame.
+- Designed extensible `Player` classes to support different learning strategies.
+- Introduced modular training infrastructure (e.g., threaded training).
+- Enabled optional game visualization and screenshot capture.
+- Added support for all-against-all matchmaking and semi-automated video creation.
 
-#### Neural network architecture
+## Setup
 
-The neural network has 25 input nodes, one hidden layer with 256 nodes and an output layer with 4 nodes corresponding
-to 4 directions (left, right, up, down).
-
-#### Training
-
-The model has a max replay memory buffer of 100 000 and it trains in batch sizes of 1000.
-
-### Highlights
-
-After approximately 900 games or when the epsilon is sufficiently low for the model to be exploitive the vast majority of the time, 
-the ML agent begins to surpass the CPU player, primarily due to the simplistic strategy employed by the CPU player.
-
-### In conclusion
-
-I had a hard time choosing the right information for the "environment" to expose to the model. I originally
-was only passing in 3 values in an array like this: [danger straight, safe left, safe right] in reality this is something like
-[1, 0, 0]. This was fine, but the model would walk right into a corner or trap itself somehow. So after doing some research I got the idea of
-vision grids from a paper out of a university in Amsterdam. This significantly improved the model's ability to not get trapped, and improved the overall survival time.
-
-### Game customization
-
-To adjust various parameters of the game, open the settings.py file. Here, you'll find modifiable constants such as
-GAMMA, the learning rate (LR), and options for color customization.
-
-### Running the game
-
-Have [Conda](https://www.conda.io/projects/conda/en/latest/user-guide/install/index.html) and [Python](https://www.python.org/downloads/) installed on your machine
-
-Clone this repo and enter to the cloned repo. Then run these commands in the terminal:
 ```bash
-conda env create -f environment.yml
-
-conda activate pygame_env
+git clone https://github.com/JustWatcher124/TronAgent-Zeus.git
+cd TronAgent-Zeus
+pip install -r requirements.txt
 ```
-
-To run the game:
+### To play (stub)
 ```bash
-python main.py
+python play_main.py
+```
+### To train
+```bash
+python threaded_training.py
 ```
