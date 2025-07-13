@@ -1,0 +1,21 @@
+Final Rankings (by total wins):
+1. RL_7x7 - 158 pts
+2. RL_5x5 - 145 pts
+3. RL_11x11 - 130 pts
+4. GA_NPNET_7x7 - 121 pts
+5. GA_NPNET_5x5 - 120 pts
+6. GA_NPNET_9x9 - 100 pts
+7. GA_KERAS_5x5 - 91 pts
+8. GA_NPNET_11x11 - 80 pts
+9. GA_KERAS_9x9 - 79 pts
+10. GA_KERAS_11x11 - 78 pts
+11. GA_KERAS_7x7 - 70 pts
+12. GA_NPNET_Full - 66 pts
+13. RL_9x9 - 50 pts
+14. Dodger - 33 pts
+15. GA_KERAS_Full - 28 pts
+16. RL_Full - 9 pts
+17. ForwardBot - 0 pts
+
+longest match:
+videos/GA_NPNET_5x5_vs_RL_7x7.mp4

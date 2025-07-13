@@ -18,7 +18,7 @@ class HumanPlayer(Player):
     def __init__(self, name="You"):
         super().__init__(name)
 
-    def get_action(self, state, position: Position):
+    def get_action(self, state, position: Position, _):
         keys = pygame.key.get_pressed()
 
         # Default: go straight
@@ -36,36 +36,33 @@ class ScriptedPlayer(Player):
     def __init__(self, name="ForwardBot"):
         super().__init__(name)
 
-    def get_action(self, state, position: Position):
+    def get_action(self, state, position: Position, _):
         # print(state)
         return [1, 0, 0]  # always forward
 
 
 class ScriptedPlayerV2(Player):
-    def __init__(self, name="Dodger"):
+    def __init__(self, name="Dodger", direction='right'):
         super().__init__(name)
-        self.direction = Direction.RIGHT
+        if direction == 'right':
+            self.direction = Direction.RIGHT
+        elif direction == 'left':
+            self.direction = Direction.LEFT
 
-    def get_action(self, state, position: Position):
+    def get_action(self, state, position: Position, direction: Direction):
         x, y = position.x, position.y
         height, width = state.shape
-
-        ahead = self._get_relative_position(position, self.direction)
-
-        # Check for obstacle ahead
+        ahead = self._get_relative_position(position, direction)
+        
         if not self._is_inside(ahead, width, height) or state[ahead.y, ahead.x] != 0:
-            # Try dodging
             if random.random() > 0.5:
-                action = [0, 1, 0]  # turn right
-                self.direction = self._turn_right(self.direction)
+                action = [0, 1, 0]
             else:
-                action = [0, 0, 1]  # turn left
-                self.direction = self._turn_left(self.direction)
+                action = [0, 0, 1]
         else:
-            action = [1, 0, 0]  # go straight
+            action = [1, 0, 0]
 
         return action
-
     def _get_relative_position(self, pos, direction):
         if direction == Direction.RIGHT:
             return Position(pos.x + 1, pos.y)

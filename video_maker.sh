@@ -1,0 +1,63 @@
+#!/bin/bash
+
+INPUT_DIR="matchmaking_screens"
+TEMP_DIR="temp_videos"
+OUTPUT_DIR="videos"
+
+mkdir -p "$TEMP_DIR"
+mkdir -p "$OUTPUT_DIR"
+
+declare -A MATCH_EPISODES
+
+# Step 1: Build a list of episodes per match
+for GAME_DIR in "$INPUT_DIR"/*/*; do
+    if [[ -d "$GAME_DIR" && -f "$GAME_DIR/summary.json" ]]; then
+        SUMMARY_FILE="$GAME_DIR/summary.json"
+
+        MATCH=$(jq -r '.match' "$SUMMARY_FILE")
+        EPISODE=$(jq -r '.episode' "$SUMMARY_FILE")
+        MATCH_KEY=$(echo "$MATCH" | sed 's/ /_/g' | tr '/' '-')
+
+        # Append directory path to the list for this match
+        MATCH_EPISODES["$MATCH_KEY"]+="$GAME_DIR"$'\n'
+    fi
+done
+echo ${MATCH_EPISODES["ForwardBot_vs_Dodger"]}
+# Step 2: For each match, generate one combined video
+for MATCH_KEY in "${!MATCH_EPISODES[@]}"; do
+    echo "▶️ Processing $MATCH_KEY..."
+    CONCAT_LIST_FILE="$TEMP_DIR/${MATCH_KEY}_concat.txt"
+    > "$CONCAT_LIST_FILE"  # Empty file
+
+    # Go through each episode directory
+    while IFS= read -r GAME_DIR; do
+        SUMMARY_FILE="$GAME_DIR/summary.json"
+        EPISODE=$(jq -r '.episode' "$SUMMARY_FILE")
+
+        TEMP_VIDEO="$TEMP_DIR/${MATCH_KEY}_ep${EPISODE}.mp4"
+        IMG_PATTERN="$GAME_DIR/frame_%05d.png"
+
+        WINNER=$(jq -r '.winner' "$SUMMARY_FILE")
+        LOSER=$(jq -r '.loser' "$SUMMARY_FILE")
+        SCORE_WIN=$(jq -r ".score[\"$WINNER\"]" "$SUMMARY_FILE")
+        SCORE_LOSE=$(jq -r ".score[\"$LOSER\"]" "$SUMMARY_FILE")
+        #SCORE_TEXT="${WINNER}: ${SCORE_WIN}  -  ${LOSER}: ${SCORE_LOSE}"
+        RAW_SCORE_TEXT="${WINNER}: ${SCORE_WIN}  -  ${LOSER}: ${SCORE_LOSE}"
+        ESCAPED_SCORE_TEXT=$(echo "$RAW_SCORE_TEXT" | sed "s/:/\\\\:/g; s/'/\\\\'/g")
+        if ls "$GAME_DIR"/frame_*.png &> /dev/null; then
+            ffmpeg -y -framerate 10 -i "$IMG_PATTERN" \
+                -vf "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='$ESCAPED_SCORE_TEXT':x=200:y=20:fontsize=24:fontcolor=white:box=1:boxcolor=black@0.5" \
+                -c:v libx264 -pix_fmt yuv420p "$TEMP_VIDEO" < /dev/null
+
+            #echo "file '$TEMP_VIDEO'" >> "$CONCAT_LIST_FILE"
+            echo "file '$(realpath "$TEMP_VIDEO")'" >> "$CONCAT_LIST_FILE"
+        else
+            echo "⚠️ No frames in $GAME_DIR, skipping."
+        fi
+    done <<< "${MATCH_EPISODES[$MATCH_KEY]}"
+
+    # Step 3: Concatenate videos
+    FINAL_OUT="$OUTPUT_DIR/${MATCH_KEY}.mp4"
+    ffmpeg -y -f concat -safe 0 -i "$CONCAT_LIST_FILE" -c copy "$FINAL_OUT" < /dev/null
+    echo "✅ Created: $FINAL_OUT"
+done

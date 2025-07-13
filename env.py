@@ -49,11 +49,19 @@ class BaseEnv:
         self._move_player('p1', action_p1)
         self._move_player('p2', action_p2)
 
-        reward_p1, dead_p1 = self._check_collision(self.p1_head, self.p1_tail, self.p2_tail)
-        reward_p2, dead_p2 = self._check_collision(self.p2_head, self.p2_tail, self.p1_tail)
+        dead_p1 = self._is_dead(self.p1_head, self.p1_tail, self.p2_tail)
+        dead_p2 = self._is_dead(self.p2_head, self.p2_tail, self.p1_tail)
 
         self.done = dead_p1 or dead_p2
-        return reward_p1, reward_p2, self.done
+
+        if dead_p1 and not dead_p2:
+            return -10, +10, self.done, 'p2'
+        elif dead_p2 and not dead_p1:
+            return +10, -10, self.done, 'p1'
+        elif dead_p1 and dead_p2:
+            return -10, -10, self.done, 'both'
+        else:
+            return 0, 0, self.done, None
 
     def _move_player(self, player, action):
         head = getattr(self, f'{player}_head')
@@ -110,9 +118,9 @@ class BaseEnv:
 
     def get_player_view(self, player='p1'):
         if player == 'p1':
-            return self.grid.copy(), self.p1_head
+            return self.grid.copy(), self.p1_head, self.p1_dir
         elif player == 'p2':
-            return self._translate_grid(self.grid), self.p2_head
+            return self._translate_grid(self.grid), self.p2_head, self.p2_dir
         else:
             raise ValueError("Unknown player")
 
@@ -125,3 +133,10 @@ class BaseEnv:
         translated[translated == P2_HEAD + 10] = P2_HEAD
         translated[translated == P2_TAIL + 10] = P2_TAIL
         return translated
+    
+    def _is_dead(self, head, own_tail, other_tail):
+        if not (0 <= head.x < self.width and 0 <= head.y < self.height):
+            return True
+        if head in own_tail[1:] or head in other_tail:
+            return True
+        return False

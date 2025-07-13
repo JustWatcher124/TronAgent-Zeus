@@ -16,3 +16,9 @@ class Player(ABC):
 
     def reset(self):
         pass
+
+    def can_train(self):
+        return False
+
+    def can_evolve(self):
+        return False

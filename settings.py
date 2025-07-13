@@ -22,7 +22,5 @@ MIN_EPSILON = 0.001
 
 DEBUG = False
 
-ARENA_SIZE = (25, 25)  # width, height
 
-ARENA = [[0]*ARENA_SIZE[0]]*ARENA_SIZE[1]
 
